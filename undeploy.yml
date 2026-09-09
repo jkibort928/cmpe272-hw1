@@ -1,0 +1,26 @@
+---
+- name: Undeploy and Clean Web Servers
+  hosts: webservers
+  become: yes
+  tasks:
+    - name: Ensure Apache service is stopped
+      service:
+        name: apache2
+        state: stopped
+      failed_when: false # Prevents crashing if Apache wasn't running
+
+    - name: Purge Apache2 packages and configuration files
+      apt:
+        name: apache2
+        state: absent
+        purge: yes
+
+    - name: Remove leftover web server files
+      file:
+        path: /var/www/html/index.html
+        state: absent
+
+    - name: Autoremove unneeded dependency packages
+      apt:
+        autoremove: yes
+        purge: yes
